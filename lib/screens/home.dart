@@ -47,6 +47,7 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
       ),
     );
 
+    // Use pi when defining rotation tweens
     leftFlapAnimation = Tween(
       begin: pi * 1.5,
       end: pi * 0.25,
@@ -68,15 +69,8 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildRightFlap() {
-    return Container(
-      width: 8.0,
-      height: 100.0,
-      color: Colors.brown,
-    );
-  }
-
-  Widget _buildLeftFlap() {
+  // Flaps
+  Widget _buildFlap() {
     return Container(
       width: 8.0,
       height: 100.0,
@@ -90,13 +84,14 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
       height: 200.0,
       width: 200.0,
       child: Center(
-          child: Text(
-        'Click for a surprise!',
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
+        child: Text(
+          'Click for a surprise!',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      )),
+      ),
     );
   }
 
@@ -111,10 +106,10 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
             child: child,
           ),
           left: 0,
-          top: 0,
         );
       },
-      child: _buildLeftFlap(),
+      // We add a child here so we don't have to create it 60x/s in the builder property
+      child: _buildFlap(),
     );
   }
 
@@ -123,16 +118,16 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
       animation: rightFlapAnimation,
       builder: (BuildContext context, Widget child) {
         return Positioned(
-          child: Transform(
+          child: Transform.rotate(
             alignment: Alignment.topLeft,
-            transform: Matrix4.rotationZ(rightFlapAnimation.value),
+            angle: rightFlapAnimation.value,
             child: child,
           ),
           right: 0,
-          top: 0,
         );
       },
-      child: _buildRightFlap(),
+      // We add a child here so we don't have to create it 60x/s in the builder property
+      child: _buildFlap(),
     );
   }
 
@@ -153,7 +148,7 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
   }
 
   _onCatTap() {
-    if (catAnimation.value == 0.0) {
+    if (catController.status == AnimationStatus.dismissed) {
       catController.forward();
       rightFlapController.forward();
       leftFlapController.forward();
