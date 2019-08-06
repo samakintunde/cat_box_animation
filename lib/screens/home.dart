@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cat_box_animation/widgets/cat.dart';
 import 'package:flutter/material.dart';
 
@@ -8,9 +10,13 @@ class Home extends StatefulWidget {
 class HomeState extends State<Home> with TickerProviderStateMixin {
   // This stores the value of the animation
   Animation<double> catAnimation;
+  Animation<double> rightFlapAnimation;
+  Animation<double> leftFlapAnimation;
 
   // This well, controls the animation(timing, pause, play, reverse functionalities)
   AnimationController catController;
+  AnimationController leftFlapController;
+  AnimationController rightFlapController;
 
   @override
   void initState() {
@@ -18,6 +24,14 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
 
     // Instantiate animation controller
     catController = AnimationController(
+      duration: Duration(seconds: 1),
+      vsync: this,
+    );
+    leftFlapController = AnimationController(
+      duration: Duration(seconds: 1),
+      vsync: this,
+    );
+    rightFlapController = AnimationController(
       duration: Duration(seconds: 1),
       vsync: this,
     );
@@ -31,6 +45,42 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
         parent: catController,
         curve: Curves.easeInOut,
       ),
+    );
+
+    leftFlapAnimation = Tween(
+      begin: pi * 1.5,
+      end: pi * 0.25,
+    ).animate(
+      CurvedAnimation(
+        parent: leftFlapController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    rightFlapAnimation = Tween(
+      begin: pi * -1.5,
+      end: pi * -0.25,
+    ).animate(
+      CurvedAnimation(
+        parent: rightFlapController,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  Widget _buildRightFlap() {
+    return Container(
+      width: 8.0,
+      height: 100.0,
+      color: Colors.brown,
+    );
+  }
+
+  Widget _buildLeftFlap() {
+    return Container(
+      width: 8.0,
+      height: 100.0,
+      color: Colors.brown,
     );
   }
 
@@ -47,6 +97,42 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
           fontWeight: FontWeight.bold,
         ),
       )),
+    );
+  }
+
+  Widget _buildLeftFlapAnimation() {
+    return AnimatedBuilder(
+      animation: leftFlapAnimation,
+      builder: (BuildContext context, Widget child) {
+        return Positioned(
+          child: Transform(
+            alignment: Alignment.topRight,
+            transform: Matrix4.rotationZ(leftFlapAnimation.value),
+            child: child,
+          ),
+          left: 0,
+          top: 0,
+        );
+      },
+      child: _buildLeftFlap(),
+    );
+  }
+
+  Widget _buildRightFlapAnimation() {
+    return AnimatedBuilder(
+      animation: rightFlapAnimation,
+      builder: (BuildContext context, Widget child) {
+        return Positioned(
+          child: Transform(
+            alignment: Alignment.topLeft,
+            transform: Matrix4.rotationZ(rightFlapAnimation.value),
+            child: child,
+          ),
+          right: 0,
+          top: 0,
+        );
+      },
+      child: _buildRightFlap(),
     );
   }
 
@@ -69,8 +155,12 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
   _onCatTap() {
     if (catAnimation.value == 0.0) {
       catController.forward();
+      rightFlapController.forward();
+      leftFlapController.forward();
     } else {
       catController.reverse();
+      leftFlapController.reverse();
+      rightFlapController.reverse();
     }
   }
 
@@ -88,6 +178,8 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
             children: <Widget>[
               _buildCatAnimation(),
               _buildBox(),
+              _buildLeftFlapAnimation(),
+              _buildRightFlapAnimation(),
             ],
           ),
         ),
