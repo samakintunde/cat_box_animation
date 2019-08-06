@@ -18,29 +18,47 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
 
     // Instantiate animation controller
     catController = AnimationController(
-      duration: Duration(seconds: 2),
+      duration: Duration(seconds: 1),
       vsync: this,
     );
 
     // Define animation tween
     catAnimation = Tween(
       begin: 0.0,
-      end: 300.0,
+      end: -80.0,
     ).animate(
       CurvedAnimation(
         parent: catController,
-        curve: Curves.easeInOutCirc,
+        curve: Curves.easeInOut,
       ),
     );
   }
 
-  Widget _buildAnimation() {
+  Widget _buildBox() {
+    return Container(
+      color: Colors.brown,
+      height: 200.0,
+      width: 200.0,
+      child: Center(
+          child: Text(
+        'Click for a surprise!',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      )),
+    );
+  }
+
+  Widget _buildCatAnimation() {
     return AnimatedBuilder(
       animation: catAnimation,
       builder: (context, child) {
-        return Container(
+        return Positioned(
           child: child,
-          margin: EdgeInsets.only(top: catAnimation.value),
+          top: catAnimation.value,
+          right: 0.0,
+          left: 0.0,
         );
       },
       // We add a child here so we don't have to create it 60x/s in the builder property
@@ -63,8 +81,16 @@ class HomeState extends State<Home> with TickerProviderStateMixin {
         title: Text('Cat Box Animation'),
       ),
       body: GestureDetector(
-        child: _buildAnimation(),
         onTap: _onCatTap,
+        child: Center(
+          child: Stack(
+            overflow: Overflow.visible,
+            children: <Widget>[
+              _buildCatAnimation(),
+              _buildBox(),
+            ],
+          ),
+        ),
       ),
     );
   }
